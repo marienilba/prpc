@@ -60,12 +60,12 @@ export type PRPCRouter = typeof prpc;
 ## 
 
 ```typescript
-// trpc/routes/prpc.ts
+// trpc/routes/index.ts
 import { prpc } from "server/api/prpc";
 import { createTRPCRouter, enforceUserIsHost } from "server/api/trpc";
 import { z } from "zod";
  
-export const prpcRouter = createTRPCRouter({
+export const router = createTRPCRouter({
   join: prpc.game
     .data(
       z.object({
@@ -90,7 +90,7 @@ export const prpcRouter = createTRPCRouter({
    import { AppRouter } from "../server/api/root";
    import { api } from "./api";
      
-   export const prpc = createPRPCNext<AppRouter["party"], PRPCRouter>(api.party, {
+   export const prpc = createPRPCNext<AppRouter, PRPCRouter>(api, {
      app_key: process.env.NEXT_PUBLIC_PUSHER_KEY!,
      options: {
        authEndpoint: "/api/prpc/",
