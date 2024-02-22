@@ -139,6 +139,8 @@ export const prpcRouter = createTRPCRouter({
        },
        []
      );
+
+   send("join", { joined: !isJoined });
    ```
 
 ## NextJS 
