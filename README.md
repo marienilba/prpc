@@ -35,7 +35,7 @@ const p = initPRPC.context().create({
 	});
 
 export const prpc = p.createPRPCRouter({
-		game: p
+	  game: p
 	    .presenceRoute({
 	      procedure: protectedProcedure,
 	      user: z.object({
