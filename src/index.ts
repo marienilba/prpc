@@ -4,4 +4,9 @@ export {
   createNextWehbookApiHandler,
   initPRPC,
 } from "./server";
-export { getChannelId, getChannelName, getChannelType } from "./shared/utils";
+export {
+  getChannelId,
+  getChannelName,
+  getChannelType,
+  setChannelName,
+} from "./shared/utils";
