@@ -1,9 +1,11 @@
 import type {
+  MaybePromise,
   MiddlewareFunction,
   ProcedureBuilder,
   ProcedureParams,
   RootConfig,
 } from "@trpc/server";
+import { ResolveOptions } from "@trpc/server/dist/core/internals/utils";
 import { z, type ZodObject, type ZodSchema } from "zod";
 import { PRPCPusher } from "./PRPCPusher";
 import { PRPCRouteBuilder } from "./PRPCRouteBuilder";
@@ -145,9 +147,13 @@ export class PRPCPresenceRouteTRPC<
     return this;
   }
 
-  trigger(): ReturnType<
-    typeof PresenceProcedure<TProcedure, TUser, TTransformer>
-  >["mutation"] {
+  get trigger(): (
+    opts: ResolveOptions<
+      InferTRPCProcedureParams<
+        ReturnType<typeof PresenceProcedure<TProcedure, TUser, TTransformer>>
+      >
+    >
+  ) => MaybePromise<any> {
     if (this.input) {
       // @ts-ignore
       let p = this.procedure.input(this.input).use(({ ctx, next, input }) => {
