@@ -193,19 +193,29 @@ export class PRPCPresenceRouteTRPC<
     return this;
   }
 
-  exec<$Output>(
+  exec<
+    $Output,
+    TParams extends ProcedureParams<
+      AnyRootConfig,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown
+    > = InferTRPCProcedureParams<TProcedure>
+  >(
     resolver: (
       opts: Simplify<{
-        ctx: InferTRPCProcedureParams<TProcedure>["_ctx_out"] & {
-          pusher: PRPCPusher<true, TUser>;
-        };
-        input: InferTRPCProcedureParams<TProcedure>["_input_in"] &
-          ReturnType<typeof PRPCInput<TUser>>;
+        // ctx: TParams["_ctx_out"] & {
+        //   pusher: PRPCPusher<true, TUser>;
+        // };
+        input: TParams["_input_in"] & ReturnType<typeof PRPCInput<TUser>>;
       }>
     ) => MaybePromise<$Output>
   ) {}
 
-  get trigger(): <$Output>(
+  trigger<$Output>(
     resolver: (
       opts: Simplify<{
         ctx: Simplify<
@@ -219,11 +229,7 @@ export class PRPCPresenceRouteTRPC<
         >;
       }>
     ) => MaybePromise<$Output>
-  ) => BuildProcedure<
-    "mutation",
-    InferTRPCProcedureParams<TProcedure>,
-    $Output
-  > {
+  ): BuildProcedure<"mutation", InferTRPCProcedureParams<TProcedure>, $Output> {
     if (this.input as any) {
       let p = (this.procedure as any)
         .input(this.input)
