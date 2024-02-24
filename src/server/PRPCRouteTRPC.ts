@@ -129,17 +129,18 @@ export class PRPCPresenceRouteTRPC<
     return this;
   }
 
-  data<TInput extends ZodSchema>(input: TInput) {
+  data<TInput extends ZodSchema>(
+    input: TInput
+  ): PRPCPresenceRouteTRPC<
+    OverwriteTRPCProcedureParamsInput<
+      InferTRPCProcedureParams<TProcedure>,
+      TInput
+    >,
+    TUser,
+    TTransformer
+  > {
     this.input = input;
-
-    return this as PRPCPresenceRouteTRPC<
-      OverwriteTRPCProcedureParamsInput<
-        InferTRPCProcedureParams<TProcedure>,
-        TInput
-      >,
-      TUser,
-      TTransformer
-    >;
+    return this;
   }
 
   trigger(): TProcedure["mutation"] {
