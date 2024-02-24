@@ -1,4 +1,13 @@
-import type { AnyRouter, ProcedureBuilder } from "@trpc/server";
+import type {
+  AnyRouter,
+  InferOptional,
+  ProcedureBuilder,
+  Simplify,
+  UndefinedKeys,
+} from "@trpc/server";
+import { ProcedureBuilderDef } from "@trpc/server/dist/core/internals/procedureBuilder";
+import { UnsetMarker } from "@trpc/server/dist/core/internals/utils";
+import { Parser, inferParser } from "@trpc/server/dist/core/parser";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type Pusher from "pusher";
 import { z, type ZodObject, type ZodSchema } from "zod";
@@ -100,6 +109,39 @@ export type PRPCContext<
 
 export type InferTRPCProcedureContext<T extends ProcedureBuilder<any>> =
   T extends ProcedureBuilder<infer Params> ? Params["_ctx_out"] : never;
+
+export type InferTRPCProcedureParams<T extends ProcedureBuilder<any>> =
+  T["_def"] extends ProcedureBuilderDef<infer Params> ? Params : never;
+
+type Merge<TType, TWith> = {
+  [TKey in keyof TType | keyof TWith]: TKey extends keyof TType
+    ? TKey extends keyof TWith
+      ? TType[TKey] & TWith[TKey]
+      : TType[TKey]
+    : TWith[TKey & keyof TWith];
+};
+
+type OverwriteIfDefined<TType, TWith> = UnsetMarker extends TType
+  ? TWith
+  : Simplify<
+      InferOptional<Merge<TType, TWith>, UndefinedKeys<Merge<TType, TWith>>>
+    >;
+
+export type OverwriteTRPCProcedureParamsInput<
+  T extends ProcedureBuilder<any>,
+  $Parser extends Parser
+> = T["_def"] extends ProcedureBuilderDef<infer TParams>
+  ? TParams & {
+      _input_in: OverwriteIfDefined<
+        TParams["_input_in"],
+        inferParser<$Parser>["in"]
+      >;
+      _input_out: OverwriteIfDefined<
+        TParams["_input_out"],
+        inferParser<Parser>["out"]
+      >;
+    }
+  : never;
 
 export type PRPCInternalRouter = {
   [key: string]:

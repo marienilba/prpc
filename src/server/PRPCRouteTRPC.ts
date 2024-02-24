@@ -1,4 +1,5 @@
 import type {
+  BuildProcedure,
   MiddlewareFunction,
   ProcedureBuilder,
   ProcedureParams,
@@ -7,7 +8,7 @@ import type {
 import { z, type ZodObject, type ZodSchema } from "zod";
 import { PRPCPusher } from "./PRPCPusher";
 import { PRPCRouteBuilder } from "./PRPCRouteBuilder";
-import { PRPCContext } from "./types";
+import { OverwriteTRPCProcedureParamsInput, PRPCContext } from "./types";
 
 export class PRPCPublicRouteTRPC<
   TProcedure extends ProcedureBuilder<any>,
@@ -126,13 +127,13 @@ export class PRPCPresenceRouteTRPC<
   }
 
   data<TInput extends ZodObject<any>>(input: TInput) {
-    // @ts-ignore
     this.input = input;
-    // @ts-ignore
-    const update = this.procedure.input(input);
-
     return {
-      trigger: this.trigger as any as typeof update.mutation,
+      trigger: this.trigger as any as BuildProcedure<
+        "mutation",
+        OverwriteTRPCProcedureParamsInput<TProcedure, TInput>,
+        any
+      >,
     };
   }
 
