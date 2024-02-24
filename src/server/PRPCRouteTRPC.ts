@@ -300,7 +300,50 @@ export class PRPCPresenceRouteTRPC<
       unknown,
       unknown
     > = InferTRPCProcedureParams<TProcedure>
-  >(cb: (ctx: TParams["_ctx_out"], input: TParams["_input_in"]) => void) {}
+  >(
+    resolver: (ctx: {
+      ctx: TParams["_ctx_out"];
+      input: TParams["_input_in"];
+    }) => void
+  ) {}
+
+  tt<
+    $Output,
+    TParams extends ProcedureParams<
+      AnyRootConfig,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown
+    > = InferTRPCProcedureParams<TProcedure>
+  >(
+    resolver: (ctx: {
+      ctx: TParams["_ctx_out"];
+      input: TParams["_input_in"];
+    }) => MaybePromise<$Output>
+  ) {}
+
+  ttt<
+    $Output,
+    TParams extends ProcedureParams<
+      AnyRootConfig,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown
+    > = InferTRPCProcedureParams<TProcedure>
+  >(
+    resolver: (ctx: {
+      ctx: TParams["_ctx_out"];
+      input: TParams["_input_in"];
+    }) => MaybePromise<$Output>
+  ): BuildProcedure<"mutation", TParams, $Output> {
+    return null as any;
+  }
 
   trigger<
     $Output,
@@ -314,17 +357,7 @@ export class PRPCPresenceRouteTRPC<
       unknown
     > = InferTRPCProcedureParams<TProcedure>
   >(
-    resolver: <
-      TParams extends ProcedureParams<
-        AnyRootConfig,
-        unknown,
-        unknown,
-        unknown,
-        unknown,
-        unknown,
-        unknown
-      > = InferTRPCProcedureParams<TProcedure>
-    >(opts: {
+    resolver: (opts: {
       ctx: TParams["_ctx_out"] & {
         pusher: PRPCPusher<true, TUser>;
       };
