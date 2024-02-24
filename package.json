@@ -7,6 +7,7 @@
     "url": "https://github.com/marienilba/prpc.git"
   },
   "scripts": {
+    "build": "tsc --p ./tsconfig.build.json",
     "test": ""
   },
   "author": "Marie Nilba",
