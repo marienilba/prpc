@@ -3,10 +3,15 @@ import type {
   BuildProcedure,
   MaybePromise,
   MiddlewareFunction,
+  Overwrite,
   ProcedureBuilder,
   ProcedureParams,
   RootConfig,
 } from "@trpc/server";
+import {
+  DefaultValue,
+  UnsetMarker,
+} from "@trpc/server/dist/core/internals/utils";
 import { Parser, inferParser } from "@trpc/server/dist/core/parser";
 import { ZodTypeAny, z, type ZodObject, type ZodSchema } from "zod";
 import { PRPCPusher } from "./PRPCPusher";
@@ -307,7 +312,8 @@ export class PRPCPresenceRouteTRPC<
       ctx: TParams["_ctx_out"] & {
         pusher: PRPCPusher<true, TUser>;
       };
-      input: TParams["_input_in"] & ReturnType<typeof PRPCInput<TUser>>;
+      input: TParams["_input_in"] &
+        z.infer<ReturnType<typeof PRPCInput<TUser>>>;
     }) => MaybePromise<$Output>
   ) {
     if (this.input as any) {
@@ -328,7 +334,23 @@ export class PRPCPresenceRouteTRPC<
       }
       return p.mutation(resolver) as BuildProcedure<
         "mutation",
-        TParams,
+        {
+          _config: TParams["_config"];
+          _meta: TParams["_meta"];
+          _ctx_out: Overwrite<
+            TParams["_ctx_out"],
+            TParams["_ctx_out"] & {
+              pusher: PRPCPusher<true, TUser>;
+            }
+          >;
+          _input_in: DefaultValue<
+            TParams["_input_in"] & z.infer<ReturnType<typeof PRPCInput<TUser>>>,
+            TParams["_input_in"]
+          >;
+          _input_out: DefaultValue<UnsetMarker, TParams["_input_out"]>;
+          _output_in: DefaultValue<UnsetMarker, TParams["_output_in"]>;
+          _output_out: DefaultValue<UnsetMarker, TParams["_output_out"]>;
+        },
         $Output
       >;
     } else {
@@ -346,7 +368,23 @@ export class PRPCPresenceRouteTRPC<
       }
       return p.mutation(resolver) as BuildProcedure<
         "mutation",
-        TParams,
+        {
+          _config: TParams["_config"];
+          _meta: TParams["_meta"];
+          _ctx_out: Overwrite<
+            TParams["_ctx_out"],
+            TParams["_ctx_out"] & {
+              pusher: PRPCPusher<true, TUser>;
+            }
+          >;
+          _input_in: DefaultValue<
+            TParams["_input_in"] & z.infer<ReturnType<typeof PRPCInput<TUser>>>,
+            TParams["_input_in"]
+          >;
+          _input_out: DefaultValue<UnsetMarker, TParams["_input_out"]>;
+          _output_in: DefaultValue<UnsetMarker, TParams["_output_in"]>;
+          _output_out: DefaultValue<UnsetMarker, TParams["_output_out"]>;
+        },
         $Output
       >;
     }
