@@ -133,7 +133,7 @@ export class PRPCPublicRouteTRPC<
         pusher: PRPCPusher<false>;
       };
 
-      input: TParams["_input_in"] & ReturnType<typeof PRPCInput<never>>;
+      input: TParams["_input_in"] & ReturnType<typeof PRPCInput<z.ZodNever>>;
     }) => MaybePromise<$Output>
   ) {
     if (this.input as any) {
@@ -154,7 +154,24 @@ export class PRPCPublicRouteTRPC<
       }
       return p.mutation(resolver) as BuildProcedure<
         "mutation",
-        TParams,
+        {
+          _config: TParams["_config"];
+          _meta: TParams["_meta"];
+          _ctx_out: Overwrite<
+            TParams["_ctx_out"],
+            TParams["_ctx_out"] & {
+              pusher: PRPCPusher<true, z.ZodNever>;
+            }
+          >;
+          _input_in: DefaultValue<
+            TParams["_input_in"] &
+              z.infer<ReturnType<typeof PRPCInput<z.ZodNever>>>,
+            TParams["_input_in"]
+          >;
+          _input_out: DefaultValue<UnsetMarker, TParams["_input_out"]>;
+          _output_in: DefaultValue<UnsetMarker, TParams["_output_in"]>;
+          _output_out: DefaultValue<UnsetMarker, TParams["_output_out"]>;
+        },
         $Output
       >;
     } else {
@@ -172,7 +189,23 @@ export class PRPCPublicRouteTRPC<
       }
       return p.mutation(resolver) as BuildProcedure<
         "mutation",
-        TParams,
+        {
+          _config: TParams["_config"];
+          _meta: TParams["_meta"];
+          _ctx_out: Overwrite<
+            TParams["_ctx_out"],
+            TParams["_ctx_out"] & {
+              pusher: PRPCPusher<true, z.ZodNever>;
+            }
+          >;
+          _input_in: DefaultValue<
+            TParams["_input_in"] & z.infer<ReturnType<typeof PRPCInput<never>>>,
+            TParams["_input_in"]
+          >;
+          _input_out: DefaultValue<UnsetMarker, TParams["_input_out"]>;
+          _output_in: DefaultValue<UnsetMarker, TParams["_output_in"]>;
+          _output_out: DefaultValue<UnsetMarker, TParams["_output_out"]>;
+        },
         $Output
       >;
     }
@@ -271,30 +304,6 @@ export class PRPCPresenceRouteTRPC<
     this.input = schema;
     return this;
   }
-
-  ctx<
-    TParams extends ProcedureParams<
-      AnyRootConfig,
-      unknown,
-      unknown,
-      unknown,
-      unknown,
-      unknown,
-      unknown
-    > = InferTRPCProcedureParams<TProcedure>
-  >(ctx: TParams["_ctx_out"]) {}
-
-  inpot<
-    TParams extends ProcedureParams<
-      AnyRootConfig,
-      unknown,
-      unknown,
-      unknown,
-      unknown,
-      unknown,
-      unknown
-    > = InferTRPCProcedureParams<TProcedure>
-  >(ctx: TParams["_input_in"]) {}
 
   trigger<
     $Output,
