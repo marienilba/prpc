@@ -210,8 +210,8 @@ export class PRPCPresenceRouteTRPC<
                 transformer: TTransformer;
               }>,
               PRPCContext<TProcedure, false, any>,
-              ReturnType<typeof PRPCInput<TUser>>,
-              UnsetMarker
+              UnsetMarker,
+              ReturnType<typeof PRPCInput<TUser>>
             >
           >
         >
@@ -222,25 +222,25 @@ export class PRPCPresenceRouteTRPC<
     InferTRPCProcedureParams<TProcedure>,
     $Output
   > {
-    if (this.input) {
-      // @ts-ignore
-      let p = this.procedure.input(this.input).use(({ ctx, next, input }) => {
-        return next({
-          ctx: {
-            ...(ctx as object),
-            pusher: this.pusher.setInput((input as any).prpc as any),
-          },
+    if (this.input as any) {
+      let p = (this.procedure as any)
+        .input(this.input)
+        .use(({ ctx, next, input }: any) => {
+          return next({
+            ctx: {
+              ...(ctx as object),
+              pusher: this.pusher.setInput((input as any).prpc as any),
+            },
+          });
         });
-      });
       this.input = null;
-      if (this.middleware) {
+      if (this.middleware as any) {
         p = p.use(this.middleware);
         this.middleware = null;
       }
-      // @ts-ignore
-      return p.mutation;
+      return p.mutation as any;
     } else {
-      let p = this.procedure.use(({ ctx, next, input }) => {
+      let p = (this.procedure as any).use(({ ctx, next, input }: any) => {
         return next({
           ctx: {
             ...(ctx as object),
@@ -249,11 +249,10 @@ export class PRPCPresenceRouteTRPC<
         });
       });
       if (this.middleware) {
-        p = p.use(this.middleware);
+        p = p.use(this.middleware as any);
         this.middleware = null;
       }
-      // @ts-ignore
-      return p.mutation;
+      return p.mutation as any;
     }
   }
 }
