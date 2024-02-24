@@ -133,7 +133,9 @@ export class PRPCPresenceRouteTRPC<
     input: TInput
   ): PRPCPresenceRouteTRPC<
     OverwriteTRPCProcedureParamsInput<
-      InferTRPCProcedureParams<TProcedure>,
+      InferTRPCProcedureParams<
+        ReturnType<typeof PresenceProcedure<TProcedure, TUser, TTransformer>>
+      >,
       TInput
     >,
     TUser,
@@ -143,7 +145,9 @@ export class PRPCPresenceRouteTRPC<
     return this;
   }
 
-  trigger(): TProcedure["mutation"] {
+  trigger(): ReturnType<
+    typeof PresenceProcedure<TProcedure, TUser, TTransformer>
+  >["mutation"] {
     if (this.input) {
       // @ts-ignore
       let p = this.procedure.input(this.input).use(({ ctx, next, input }) => {
@@ -159,6 +163,7 @@ export class PRPCPresenceRouteTRPC<
         p = p.use(this.middleware);
         this.middleware = null;
       }
+      // @ts-ignore
       return p.mutation;
     } else {
       let p = this.procedure.use(({ ctx, next, input }) => {
@@ -173,6 +178,7 @@ export class PRPCPresenceRouteTRPC<
         p = p.use(this.middleware);
         this.middleware = null;
       }
+      // @ts-ignore
       return p.mutation;
     }
   }
