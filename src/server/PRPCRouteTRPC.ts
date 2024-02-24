@@ -7,10 +7,6 @@ import type {
   ProcedureParams,
   RootConfig,
 } from "@trpc/server";
-import {
-  ResolveOptions,
-  UnsetMarker,
-} from "@trpc/server/dist/core/internals/utils";
 import { Parser, inferParser } from "@trpc/server/dist/core/parser";
 import { ZodTypeAny, z, type ZodObject, type ZodSchema } from "zod";
 import { PRPCPusher } from "./PRPCPusher";
@@ -197,26 +193,13 @@ export class PRPCPresenceRouteTRPC<
   }
 
   get trigger(): <$Output>(
-    resolver: (
-      opts: ResolveOptions<
-        InferTRPCProcedureParams<
-          CreateProcedureReturnInput<
-            InferTRPCProcedureParams<TProcedure>,
-            ProcedureParams<
-              RootConfig<{
-                ctx: any;
-                meta: any;
-                errorShape: any;
-                transformer: TTransformer;
-              }>,
-              PRPCContext<TProcedure, false, any>,
-              UnsetMarker,
-              ReturnType<typeof PRPCInput<TUser>>
-            >
-          >
-        >
-      >
-    ) => MaybePromise<any>
+    resolver: (opts: {
+      ctx: InferTRPCProcedureParams<TProcedure>["_ctx_out"] & {
+        pusher: PRPCPusher<true, TUser>;
+      };
+      input: InferTRPCProcedureParams<TProcedure>["_input_in"] &
+        ReturnType<typeof PRPCInput<TUser>>;
+    }) => MaybePromise<$Output>
   ) => BuildProcedure<
     "mutation",
     InferTRPCProcedureParams<TProcedure>,
