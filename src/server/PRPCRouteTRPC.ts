@@ -136,7 +136,7 @@ export class PRPCPresenceRouteTRPC<
       unknown,
       unknown,
       unknown
-    > = InferTRPCProcedureParams<TProcedure>
+    > = Simplify<InferTRPCProcedureParams<TProcedure>>
   >(
     middleware: MiddlewareFunction<TParams, $Params>
   ): Omit<
@@ -162,7 +162,7 @@ export class PRPCPresenceRouteTRPC<
       unknown,
       unknown,
       unknown
-    > = InferTRPCProcedureParams<TProcedure>
+    > = Simplify<InferTRPCProcedureParams<TProcedure>>
   >(
     schema: $Parser
   ): Omit<
@@ -193,7 +193,7 @@ export class PRPCPresenceRouteTRPC<
     return this;
   }
 
-  exec<
+  trigger<
     $Output,
     TParams extends ProcedureParams<
       AnyRootConfig,
@@ -203,20 +203,8 @@ export class PRPCPresenceRouteTRPC<
       unknown,
       unknown,
       unknown
-    > = InferTRPCProcedureParams<TProcedure>
+    > = Simplify<InferTRPCProcedureParams<TProcedure>>
   >(
-    resolver: (
-      opts: Simplify<{
-        // ctx: TParams["_ctx_out"] & {
-        //   pusher: PRPCPusher<true, TUser>;
-        // };
-        // input: TParams["_input_in"] & ReturnType<typeof PRPCInput<TUser>>;
-        test1: boolean;
-      }>
-    ) => MaybePromise<$Output>
-  ) {}
-
-  trigger<$Output>(
     resolver: (
       opts: Simplify<{
         ctx: Simplify<
