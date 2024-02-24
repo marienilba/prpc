@@ -1,9 +1,4 @@
-import type {
-  AnyRootConfig,
-  AnyRouter,
-  ProcedureBuilder,
-  ProcedureParams,
-} from "@trpc/server";
+import type { AnyRouter, ProcedureBuilder } from "@trpc/server";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type Pusher from "pusher";
 import { z, type ZodObject, type ZodSchema } from "zod";
@@ -104,81 +99,7 @@ export type PRPCContext<
 };
 
 export type InferTRPCProcedureContext<T extends ProcedureBuilder<any>> =
-  T extends ProcedureBuilder<infer Params>
-    ? Params extends ProcedureParams<
-        AnyRootConfig,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any
-      >
-      ? Params extends ProcedureParams<
-          AnyRootConfig,
-          infer Context,
-          any,
-          any,
-          any,
-          any,
-          any
-        >
-        ? Context
-        : never
-      : never
-    : never;
-
-export type InferTRPCProcedureInput<T extends ProcedureBuilder<any>> =
-  T extends ProcedureBuilder<infer Params>
-    ? Params extends ProcedureParams<
-        AnyRootConfig,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any
-      >
-      ? Params extends ProcedureParams<
-          AnyRootConfig,
-          any,
-          infer Input,
-          any,
-          any,
-          any,
-          any
-        >
-        ? Input
-        : never
-      : never
-    : never;
-
-export type InferTRPCProcedureOutput<T extends ProcedureBuilder<any>> =
-  T extends ProcedureBuilder<infer Params>
-    ? Params extends ProcedureParams<
-        AnyRootConfig,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any
-      >
-      ? Params extends ProcedureParams<
-          AnyRootConfig,
-          any,
-          any,
-          infer Ouput,
-          any,
-          any,
-          any
-        >
-        ? Ouput
-        : never
-      : never
-    : never;
-export type InferTRPCProcedureParams<T extends ProcedureBuilder<any>> =
-  T extends ProcedureBuilder<infer Params> ? Params : never;
+  T extends ProcedureBuilder<infer Params> ? Params["_ctx_out"] : never;
 
 export type PRPCInternalRouter = {
   [key: string]:
