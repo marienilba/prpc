@@ -3,6 +3,7 @@ import type {
   BuildProcedure,
   InferOptional,
   MaybePromise,
+  Overwrite,
   ProcedureBuilder,
   ProcedureParams,
   Simplify,
@@ -120,6 +121,19 @@ export type InferTRPCProcedureContext<T extends ProcedureBuilder<any>> =
 export type InferTRPCProcedureParams<T extends ProcedureBuilder<any>> =
   T["_def"] extends ProcedureBuilderDef<infer Params> ? Params : never;
 
+export type CreateProcedureReturnInput<
+  TPrev extends ProcedureParams,
+  TNext extends ProcedureParams
+> = ProcedureBuilder<{
+  _config: TPrev["_config"];
+  _meta: TPrev["_meta"];
+  _ctx_out: Overwrite<TPrev["_ctx_out"], TNext["_ctx_out"]>;
+  _input_in: DefaultValue<TNext["_input_in"], TPrev["_input_in"]>;
+  _input_out: DefaultValue<TNext["_input_out"], TPrev["_input_out"]>;
+  _output_in: DefaultValue<TNext["_output_in"], TPrev["_output_in"]>;
+  _output_out: DefaultValue<TNext["_output_out"], TPrev["_output_out"]>;
+}>;
+
 type Merge<TType, TWith> = {
   [TKey in keyof TType | keyof TWith]: TKey extends keyof TType
     ? TKey extends keyof TWith
@@ -128,7 +142,7 @@ type Merge<TType, TWith> = {
     : TWith[TKey & keyof TWith];
 };
 
-type OverwriteIfDefined<TType, TWith> = UnsetMarker extends TType
+export type OverwriteIfDefined<TType, TWith> = UnsetMarker extends TType
   ? TWith
   : Simplify<
       InferOptional<Merge<TType, TWith>, UndefinedKeys<Merge<TType, TWith>>>

@@ -1,17 +1,24 @@
 import type {
+  AnyRootConfig,
+  BuildProcedure,
   MaybePromise,
   MiddlewareFunction,
   ProcedureBuilder,
   ProcedureParams,
   RootConfig,
 } from "@trpc/server";
-import { ResolveOptions } from "@trpc/server/dist/core/internals/utils";
-import { z, type ZodObject, type ZodSchema } from "zod";
+import {
+  ResolveOptions,
+  UnsetMarker,
+} from "@trpc/server/dist/core/internals/utils";
+import { Parser, inferParser } from "@trpc/server/dist/core/parser";
+import { ZodTypeAny, z, type ZodObject, type ZodSchema } from "zod";
 import { PRPCPusher } from "./PRPCPusher";
 import { PRPCRouteBuilder } from "./PRPCRouteBuilder";
 import {
+  CreateProcedureReturnInput,
   InferTRPCProcedureParams,
-  OverwriteTRPCProcedureParamsInput,
+  OverwriteIfDefined,
   PRPCContext,
 } from "./types";
 
@@ -106,10 +113,8 @@ export class PRPCPresenceRouteTRPC<
     builder: PRPCRouteBuilder<any, any, ZodObject<any>>;
   };
   private pusher: PRPCPusher<true, TUser>;
-  private procedure: ReturnType<
-    typeof PresenceProcedure<TProcedure, TUser, TTransformer>
-  >;
-  private input: ZodSchema | null = null;
+  private procedure: TProcedure;
+  private input: Parser | null = null;
   private middleware: MiddlewareFunction<any, any> | null = null;
   constructor(
     builder: PRPCRouteBuilder<any, any, ZodObject<any>>,
@@ -124,36 +129,99 @@ export class PRPCPresenceRouteTRPC<
     this.pusher = pusher;
   }
 
-  use<TMiddleware extends MiddlewareFunction<any, any>>(
-    middleware: TMiddleware
-  ) {
-    this.middleware = middleware;
-    return this;
-  }
-
-  data<TInput extends ZodSchema>(
-    input: TInput
-  ): PRPCPresenceRouteTRPC<
-    OverwriteTRPCProcedureParamsInput<
-      InferTRPCProcedureParams<
-        ReturnType<typeof PresenceProcedure<TProcedure, TUser, TTransformer>>
-      >,
-      TInput
+  use<
+    $Params extends ProcedureParams,
+    TParams extends ProcedureParams<
+      AnyRootConfig,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown
+    > = InferTRPCProcedureParams<TProcedure>
+  >(
+    middleware: MiddlewareFunction<TParams, $Params>
+  ): Omit<
+    PRPCPresenceRouteTRPC<
+      CreateProcedureReturnInput<$Params, $Params>,
+      TUser,
+      TTransformer
     >,
-    TUser,
-    TTransformer
+    "_defs"
   > {
-    this.input = input;
+    this.middleware = middleware;
+    // @ts-ignore
     return this;
   }
 
-  get trigger(): (
-    opts: ResolveOptions<
-      InferTRPCProcedureParams<
-        ReturnType<typeof PresenceProcedure<TProcedure, TUser, TTransformer>>
+  data<
+    $Parser extends Parser,
+    TParams extends ProcedureParams<
+      AnyRootConfig,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown
+    > = InferTRPCProcedureParams<TProcedure>
+  >(
+    schema: $Parser
+  ): Omit<
+    PRPCPresenceRouteTRPC<
+      ProcedureBuilder<{
+        _config: TParams["_config"];
+        _meta: TParams["_meta"];
+        _ctx_out: TParams["_ctx_out"];
+        _input_in: OverwriteIfDefined<
+          TParams["_input_in"],
+          inferParser<$Parser>["in"]
+        >;
+        _input_out: OverwriteIfDefined<
+          TParams["_input_out"],
+          inferParser<$Parser>["out"]
+        >;
+
+        _output_in: TParams["_output_in"];
+        _output_out: TParams["_output_out"];
+      }>,
+      TUser,
+      TTransformer
+    >,
+    "_defs"
+  > {
+    this.input = schema;
+    // @ts-ignore
+    return this;
+  }
+
+  get trigger(): <$Output>(
+    resolver: (
+      opts: ResolveOptions<
+        InferTRPCProcedureParams<
+          CreateProcedureReturnInput<
+            InferTRPCProcedureParams<TProcedure>,
+            ProcedureParams<
+              RootConfig<{
+                ctx: any;
+                meta: any;
+                errorShape: any;
+                transformer: TTransformer;
+              }>,
+              PRPCContext<TProcedure, false, any>,
+              ReturnType<typeof PRPCInput<TUser>>,
+              UnsetMarker
+            >
+          >
+        >
       >
-    >
-  ) => MaybePromise<any> {
+    ) => MaybePromise<any>
+  ) => BuildProcedure<
+    "mutation",
+    InferTRPCProcedureParams<TProcedure>,
+    $Output
+  > {
     if (this.input) {
       // @ts-ignore
       let p = this.procedure.input(this.input).use(({ ctx, next, input }) => {
@@ -258,3 +326,19 @@ export function PresenceProcedure<
     })
   );
 }
+
+const PRPCInput = <T extends ZodTypeAny>(user: T) =>
+  z.object({
+    prpc: z.object({
+      channel_type: z.string().optional(),
+      channel_id: z.string().optional(),
+      channel_name: z.string().optional(),
+      channel_event: z.string(),
+      socket_id: z.string().optional(),
+      members: z.object({}).catchall(user),
+      me: z.object({
+        id: z.string(),
+        info: user,
+      }),
+    }),
+  });
