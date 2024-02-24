@@ -6,7 +6,6 @@ import type {
   Overwrite,
   ProcedureBuilder,
   ProcedureParams,
-  Simplify,
   UndefinedKeys,
 } from "@trpc/server";
 import { ProcedureBuilderDef } from "@trpc/server/dist/core/internals/procedureBuilder";
@@ -114,6 +113,8 @@ export type PRPCContext<
 > = InferTRPCProcedureContext<T> & {
   pusher: PRPCPusherContext<TPresence, z.infer<TMe>>;
 };
+
+export type Simplify<T> = { [K in keyof T]: T[K] } & {};
 
 export type InferTRPCProcedureContext<T extends ProcedureBuilder<any>> =
   T extends ProcedureBuilder<infer Params> ? Params["_ctx_out"] : never;

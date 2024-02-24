@@ -6,7 +6,6 @@ import type {
   ProcedureBuilder,
   ProcedureParams,
   RootConfig,
-  Simplify,
 } from "@trpc/server";
 import { Parser, inferParser } from "@trpc/server/dist/core/parser";
 import { ZodTypeAny, z, type ZodObject, type ZodSchema } from "zod";
@@ -17,6 +16,7 @@ import {
   InferTRPCProcedureParams,
   OverwriteIfDefined,
   PRPCContext,
+  Simplify,
 } from "./types";
 
 export class PRPCPublicRouteTRPC<
@@ -136,7 +136,7 @@ export class PRPCPresenceRouteTRPC<
       unknown,
       unknown,
       unknown
-    > = Simplify<InferTRPCProcedureParams<TProcedure>>
+    > = InferTRPCProcedureParams<TProcedure>
   >(
     middleware: MiddlewareFunction<TParams, $Params>
   ): Omit<
@@ -162,7 +162,7 @@ export class PRPCPresenceRouteTRPC<
       unknown,
       unknown,
       unknown
-    > = Simplify<InferTRPCProcedureParams<TProcedure>>
+    > = InferTRPCProcedureParams<TProcedure>
   >(
     schema: $Parser
   ): Omit<
@@ -203,7 +203,7 @@ export class PRPCPresenceRouteTRPC<
       unknown,
       unknown,
       unknown
-    > = Simplify<InferTRPCProcedureParams<TProcedure>>
+    > = InferTRPCProcedureParams<TProcedure>
   >(
     resolver: (
       opts: Simplify<{
