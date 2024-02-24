@@ -1,12 +1,19 @@
 import type {
   AnyRouter,
+  BuildProcedure,
   InferOptional,
+  MaybePromise,
   ProcedureBuilder,
+  ProcedureParams,
   Simplify,
   UndefinedKeys,
 } from "@trpc/server";
 import { ProcedureBuilderDef } from "@trpc/server/dist/core/internals/procedureBuilder";
-import { UnsetMarker } from "@trpc/server/dist/core/internals/utils";
+import {
+  DefaultValue,
+  ResolveOptions,
+  UnsetMarker,
+} from "@trpc/server/dist/core/internals/utils";
 import { Parser, inferParser } from "@trpc/server/dist/core/parser";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type Pusher from "pusher";
@@ -128,19 +135,30 @@ type OverwriteIfDefined<TType, TWith> = UnsetMarker extends TType
     >;
 
 export type OverwriteTRPCProcedureParamsInput<
+  TParams extends ProcedureParams,
+  $Parser extends Parser
+> = TParams & {
+  _input_in: OverwriteIfDefined<
+    TParams["_input_in"],
+    inferParser<$Parser>["in"]
+  >;
+  _input_out: OverwriteIfDefined<
+    TParams["_input_out"],
+    inferParser<Parser>["out"]
+  >;
+};
+
+export type TriggerPRPCProcedure<TParams extends ProcedureParams> = (
+  resolver: (
+    opts: ResolveOptions<TParams>
+  ) => MaybePromise<DefaultValue<TParams["_output_in"], any>>
+) => BuildProcedure<"mutation", TParams, any>;
+
+export type TriggerPRPCProcedureBuilder<
   T extends ProcedureBuilder<any>,
   $Parser extends Parser
 > = T["_def"] extends ProcedureBuilderDef<infer TParams>
-  ? TParams & {
-      _input_in: OverwriteIfDefined<
-        TParams["_input_in"],
-        inferParser<$Parser>["in"]
-      >;
-      _input_out: OverwriteIfDefined<
-        TParams["_input_out"],
-        inferParser<Parser>["out"]
-      >;
-    }
+  ? TriggerPRPCProcedure<OverwriteTRPCProcedureParamsInput<TParams, $Parser>>
   : never;
 
 export type PRPCInternalRouter = {
