@@ -300,7 +300,7 @@ export class PRPCPresenceRouteTRPC<
       unknown,
       unknown
     > = InferTRPCProcedureParams<TProcedure>
-  >(ctx: TParams["_ctx_out"], input: TParams["_input_in"]) {}
+  >(cb: (ctx: TParams["_ctx_out"], input: TParams["_input_in"]) => void) {}
 
   trigger<
     $Output,
@@ -314,7 +314,17 @@ export class PRPCPresenceRouteTRPC<
       unknown
     > = InferTRPCProcedureParams<TProcedure>
   >(
-    resolver: (opts: {
+    resolver: <
+      TParams extends ProcedureParams<
+        AnyRootConfig,
+        unknown,
+        unknown,
+        unknown,
+        unknown,
+        unknown,
+        unknown
+      > = InferTRPCProcedureParams<TProcedure>
+    >(opts: {
       ctx: TParams["_ctx_out"] & {
         pusher: PRPCPusher<true, TUser>;
       };
