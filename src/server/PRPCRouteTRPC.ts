@@ -153,7 +153,7 @@ export class PRPCPublicRouteTRPC<
         p = p.use(this.middleware);
         this.middleware = null;
       }
-      return p.mutation as any;
+      return p.mutation(resolver) as any;
     } else {
       let p = (this.procedure as any).use(({ ctx, next, input }: any) => {
         return next({
@@ -167,7 +167,7 @@ export class PRPCPublicRouteTRPC<
         p = p.use(this.middleware as any);
         this.middleware = null;
       }
-      return p.mutation as any;
+      return p.mutation(resolver) as any;
     }
   }
 }
@@ -265,6 +265,30 @@ export class PRPCPresenceRouteTRPC<
     return this;
   }
 
+  ctx<
+    TParams extends ProcedureParams<
+      AnyRootConfig,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown
+    > = InferTRPCProcedureParams<TProcedure>
+  >(ctx: TParams["_ctx_out"]) {}
+
+  inpot<
+    TParams extends ProcedureParams<
+      AnyRootConfig,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown
+    > = InferTRPCProcedureParams<TProcedure>
+  >(ctx: TParams["_input_in"]) {}
+
   trigger<
     $Output,
     TParams extends ProcedureParams<
@@ -306,7 +330,7 @@ export class PRPCPresenceRouteTRPC<
         p = p.use(this.middleware);
         this.middleware = null;
       }
-      return p.mutation as any;
+      return p.mutation(resolver) as any;
     } else {
       let p = (this.procedure as any).use(({ ctx, next, input }: any) => {
         return next({
@@ -320,7 +344,7 @@ export class PRPCPresenceRouteTRPC<
         p = p.use(this.middleware as any);
         this.middleware = null;
       }
-      return p.mutation as any;
+      return p.mutation(resolver) as any;
     }
   }
 }
