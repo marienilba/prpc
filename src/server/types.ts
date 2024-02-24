@@ -119,7 +119,7 @@ export type InferTRPCProcedureContext<T extends ProcedureBuilder<any>> =
   T extends ProcedureBuilder<infer Params> ? Params["_ctx_out"] : never;
 
 export type InferTRPCProcedureParams<T extends ProcedureBuilder<any>> =
-  T["_def"] extends ProcedureBuilderDef<infer Params> ? Params : never;
+  T extends ProcedureBuilder<infer Params> ? Params : never;
 
 export type CreateProcedureReturnInput<
   TPrev extends ProcedureParams,
