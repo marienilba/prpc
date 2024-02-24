@@ -210,7 +210,8 @@ export class PRPCPresenceRouteTRPC<
         // ctx: TParams["_ctx_out"] & {
         //   pusher: PRPCPusher<true, TUser>;
         // };
-        input: TParams["_input_in"] & ReturnType<typeof PRPCInput<TUser>>;
+        // input: TParams["_input_in"] & ReturnType<typeof PRPCInput<TUser>>;
+        test: boolean;
       }>
     ) => MaybePromise<$Output>
   ) {}
