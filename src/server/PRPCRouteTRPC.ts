@@ -208,17 +208,16 @@ export class PRPCPresenceRouteTRPC<
     resolver: (
       opts: Simplify<{
         ctx: Simplify<
-          InferTRPCProcedureParams<TProcedure>["_ctx_out"] & {
+          TParams["_ctx_out"] & {
             pusher: PRPCPusher<true, TUser>;
           }
         >;
         input: Simplify<
-          InferTRPCProcedureParams<TProcedure>["_input_in"] &
-            ReturnType<typeof PRPCInput<TUser>>
+          TParams["_input_in"] & ReturnType<typeof PRPCInput<TUser>>
         >;
       }>
     ) => MaybePromise<$Output>
-  ): BuildProcedure<"mutation", InferTRPCProcedureParams<TProcedure>, $Output> {
+  ): BuildProcedure<"mutation", TParams, $Output> {
     if (this.input as any) {
       let p = (this.procedure as any)
         .input(this.input)
