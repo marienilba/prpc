@@ -193,18 +193,32 @@ export class PRPCPresenceRouteTRPC<
     return this;
   }
 
-  get trigger(): <$Output>(
-    resolver: (opts: {
-      ctx: Simplify<
-        InferTRPCProcedureParams<TProcedure>["_ctx_out"] & {
+  exec<$Output>(
+    resolver: (
+      opts: Simplify<{
+        ctx: InferTRPCProcedureParams<TProcedure>["_ctx_out"] & {
           pusher: PRPCPusher<true, TUser>;
-        }
-      >;
-      input: Simplify<
-        InferTRPCProcedureParams<TProcedure>["_input_in"] &
-          ReturnType<typeof PRPCInput<TUser>>
-      >;
-    }) => MaybePromise<$Output>
+        };
+        input: InferTRPCProcedureParams<TProcedure>["_input_in"] &
+          ReturnType<typeof PRPCInput<TUser>>;
+      }>
+    ) => MaybePromise<$Output>
+  ) {}
+
+  get trigger(): <$Output>(
+    resolver: (
+      opts: Simplify<{
+        ctx: Simplify<
+          InferTRPCProcedureParams<TProcedure>["_ctx_out"] & {
+            pusher: PRPCPusher<true, TUser>;
+          }
+        >;
+        input: Simplify<
+          InferTRPCProcedureParams<TProcedure>["_input_in"] &
+            ReturnType<typeof PRPCInput<TUser>>
+        >;
+      }>
+    ) => MaybePromise<$Output>
   ) => BuildProcedure<
     "mutation",
     InferTRPCProcedureParams<TProcedure>,
