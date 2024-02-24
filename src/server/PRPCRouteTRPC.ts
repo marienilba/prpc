@@ -211,7 +211,7 @@ export class PRPCPresenceRouteTRPC<
         //   pusher: PRPCPusher<true, TUser>;
         // };
         // input: TParams["_input_in"] & ReturnType<typeof PRPCInput<TUser>>;
-        test: boolean;
+        test1: boolean;
       }>
     ) => MaybePromise<$Output>
   ) {}
