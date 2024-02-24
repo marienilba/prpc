@@ -16,7 +16,6 @@ import {
   InferTRPCProcedureParams,
   OverwriteIfDefined,
   PRPCContext,
-  Simplify,
 } from "./types";
 
 export class PRPCPublicRouteTRPC<
@@ -124,19 +123,14 @@ export class PRPCPublicRouteTRPC<
       unknown
     > = InferTRPCProcedureParams<TProcedure>
   >(
-    resolver: (
-      opts: Simplify<{
-        ctx: Simplify<
-          TParams["_ctx_out"] & {
-            pusher: PRPCPusher<false>;
-          }
-        >;
-        input: Simplify<
-          TParams["_input_in"] & ReturnType<typeof PRPCInput<never>>
-        >;
-      }>
-    ) => MaybePromise<$Output>
-  ): BuildProcedure<"mutation", TParams, $Output> {
+    resolver: (opts: {
+      ctx: TParams["_ctx_out"] & {
+        pusher: PRPCPusher<false>;
+      };
+
+      input: TParams["_input_in"] & ReturnType<typeof PRPCInput<never>>;
+    }) => MaybePromise<$Output>
+  ) {
     if (this.input as any) {
       let p = (this.procedure as any)
         .input(this.input)
@@ -153,7 +147,11 @@ export class PRPCPublicRouteTRPC<
         p = p.use(this.middleware);
         this.middleware = null;
       }
-      return p.mutation(resolver) as any;
+      return p.mutation(resolver) as BuildProcedure<
+        "mutation",
+        TParams,
+        $Output
+      >;
     } else {
       let p = (this.procedure as any).use(({ ctx, next, input }: any) => {
         return next({
@@ -167,7 +165,11 @@ export class PRPCPublicRouteTRPC<
         p = p.use(this.middleware as any);
         this.middleware = null;
       }
-      return p.mutation(resolver) as any;
+      return p.mutation(resolver) as BuildProcedure<
+        "mutation",
+        TParams,
+        $Output
+      >;
     }
   }
 }
@@ -289,62 +291,6 @@ export class PRPCPresenceRouteTRPC<
     > = InferTRPCProcedureParams<TProcedure>
   >(ctx: TParams["_input_in"]) {}
 
-  t<
-    $Output,
-    TParams extends ProcedureParams<
-      AnyRootConfig,
-      unknown,
-      unknown,
-      unknown,
-      unknown,
-      unknown,
-      unknown
-    > = InferTRPCProcedureParams<TProcedure>
-  >(
-    resolver: (ctx: {
-      ctx: TParams["_ctx_out"];
-      input: TParams["_input_in"];
-    }) => void
-  ) {}
-
-  tt<
-    $Output,
-    TParams extends ProcedureParams<
-      AnyRootConfig,
-      unknown,
-      unknown,
-      unknown,
-      unknown,
-      unknown,
-      unknown
-    > = InferTRPCProcedureParams<TProcedure>
-  >(
-    resolver: (ctx: {
-      ctx: TParams["_ctx_out"];
-      input: TParams["_input_in"];
-    }) => MaybePromise<$Output>
-  ) {}
-
-  ttt<
-    $Output,
-    TParams extends ProcedureParams<
-      AnyRootConfig,
-      unknown,
-      unknown,
-      unknown,
-      unknown,
-      unknown,
-      unknown
-    > = InferTRPCProcedureParams<TProcedure>
-  >(
-    resolver: (ctx: {
-      ctx: TParams["_ctx_out"];
-      input: TParams["_input_in"];
-    }) => MaybePromise<$Output>
-  ): BuildProcedure<"mutation", TParams, $Output> {
-    return null as any;
-  }
-
   trigger<
     $Output,
     TParams extends ProcedureParams<
@@ -363,7 +309,7 @@ export class PRPCPresenceRouteTRPC<
       };
       input: TParams["_input_in"] & ReturnType<typeof PRPCInput<TUser>>;
     }) => MaybePromise<$Output>
-  ): BuildProcedure<"mutation", TParams, $Output> {
+  ) {
     if (this.input as any) {
       let p = (this.procedure as any)
         .input(this.input)
@@ -380,7 +326,11 @@ export class PRPCPresenceRouteTRPC<
         p = p.use(this.middleware);
         this.middleware = null;
       }
-      return p.mutation(resolver) as any;
+      return p.mutation(resolver) as BuildProcedure<
+        "mutation",
+        TParams,
+        $Output
+      >;
     } else {
       let p = (this.procedure as any).use(({ ctx, next, input }: any) => {
         return next({
@@ -394,7 +344,11 @@ export class PRPCPresenceRouteTRPC<
         p = p.use(this.middleware as any);
         this.middleware = null;
       }
-      return p.mutation(resolver) as any;
+      return p.mutation(resolver) as BuildProcedure<
+        "mutation",
+        TParams,
+        $Output
+      >;
     }
   }
 }
