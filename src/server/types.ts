@@ -137,16 +137,22 @@ type OverwriteIfDefined<TType, TWith> = UnsetMarker extends TType
 export type OverwriteTRPCProcedureParamsInput<
   TParams extends ProcedureParams,
   $Parser extends Parser
-> = TParams & {
+> = ProcedureBuilder<{
+  _config: TParams["_config"];
+  _meta: TParams["_meta"];
+  _ctx_out: TParams["_ctx_out"];
   _input_in: OverwriteIfDefined<
     TParams["_input_in"],
     inferParser<$Parser>["in"]
   >;
   _input_out: OverwriteIfDefined<
     TParams["_input_out"],
-    inferParser<Parser>["out"]
+    inferParser<$Parser>["out"]
   >;
-};
+
+  _output_in: TParams["_output_in"];
+  _output_out: TParams["_output_out"];
+}>;
 
 export type TriggerPRPCProcedure<TParams extends ProcedureParams> = (
   resolver: (
@@ -158,7 +164,11 @@ export type TriggerPRPCProcedureBuilder<
   T extends ProcedureBuilder<any>,
   $Parser extends Parser
 > = T["_def"] extends ProcedureBuilderDef<infer TParams>
-  ? TriggerPRPCProcedure<OverwriteTRPCProcedureParamsInput<TParams, $Parser>>
+  ? TriggerPRPCProcedure<
+      InferTRPCProcedureParams<
+        OverwriteTRPCProcedureParamsInput<TParams, $Parser>
+      >
+    >
   : never;
 
 export type PRPCInternalRouter = {

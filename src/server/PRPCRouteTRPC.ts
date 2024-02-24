@@ -7,7 +7,11 @@ import type {
 import { z, type ZodObject, type ZodSchema } from "zod";
 import { PRPCPusher } from "./PRPCPusher";
 import { PRPCRouteBuilder } from "./PRPCRouteBuilder";
-import { PRPCContext, TriggerPRPCProcedureBuilder } from "./types";
+import {
+  InferTRPCProcedureParams,
+  OverwriteTRPCProcedureParamsInput,
+  PRPCContext,
+} from "./types";
 
 export class PRPCPublicRouteTRPC<
   TProcedure extends ProcedureBuilder<any>,
@@ -103,7 +107,7 @@ export class PRPCPresenceRouteTRPC<
   private procedure: ReturnType<
     typeof PresenceProcedure<TProcedure, TUser, TTransformer>
   >;
-  private input: ZodObject<any> | null = null;
+  private input: ZodSchema | null = null;
   private middleware: MiddlewareFunction<any, any> | null = null;
   constructor(
     builder: PRPCRouteBuilder<any, any, ZodObject<any>>,
@@ -125,18 +129,20 @@ export class PRPCPresenceRouteTRPC<
     return this;
   }
 
-  data<TInput extends ZodObject<any>>(input: TInput) {
+  data<TInput extends ZodSchema>(input: TInput) {
     this.input = input;
 
-    return {
-      trigger: this.trigger as any as TriggerPRPCProcedureBuilder<
-        TProcedure,
+    return this as PRPCPresenceRouteTRPC<
+      OverwriteTRPCProcedureParamsInput<
+        InferTRPCProcedureParams<TProcedure>,
         TInput
       >,
-    };
+      TUser,
+      TTransformer
+    >;
   }
 
-  get trigger() {
+  trigger(): TProcedure["mutation"] {
     if (this.input) {
       // @ts-ignore
       let p = this.procedure.input(this.input).use(({ ctx, next, input }) => {
