@@ -47,43 +47,115 @@ export class PRPCPublicRouteTRPC<
     this.pusher = pusher;
   }
 
-  use<TMiddleware extends MiddlewareFunction<any, any>>(
-    middleware: TMiddleware
-  ) {
+  use<
+    $Params extends ProcedureParams,
+    TParams extends ProcedureParams<
+      AnyRootConfig,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown
+    > = InferTRPCProcedureParams<TProcedure>
+  >(
+    middleware: MiddlewareFunction<TParams, $Params>
+  ): Omit<
+    PRPCPublicRouteTRPC<
+      CreateProcedureReturnInput<$Params, $Params>,
+      TTransformer
+    >,
+    "_defs"
+  > {
     this.middleware = middleware;
+    // @ts-ignore
     return this;
   }
 
-  data<TInput extends ZodObject<any>>(input: TInput) {
-    // @ts-ignore
-    this.input = input;
-    // @ts-ignore
-    const update = this.procedure.input(input);
+  data<
+    $Parser extends Parser,
+    TParams extends ProcedureParams<
+      AnyRootConfig,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown
+    > = InferTRPCProcedureParams<TProcedure>
+  >(
+    schema: $Parser
+  ): Omit<
+    PRPCPublicRouteTRPC<
+      ProcedureBuilder<{
+        _config: TParams["_config"];
+        _meta: TParams["_meta"];
+        _ctx_out: TParams["_ctx_out"];
+        _input_in: OverwriteIfDefined<
+          TParams["_input_in"],
+          inferParser<$Parser>["in"]
+        >;
+        _input_out: OverwriteIfDefined<
+          TParams["_input_out"],
+          inferParser<$Parser>["out"]
+        >;
 
-    return {
-      trigger: this.trigger as any as typeof update.mutation,
-    };
+        _output_in: TParams["_output_in"];
+        _output_out: TParams["_output_out"];
+      }>,
+      TTransformer
+    >,
+    "_defs"
+  > {
+    // @ts-ignore
+    this.input = schema;
+    return this;
   }
 
-  get trigger() {
-    if (this.input) {
-      // @ts-ignore
-      let p = this.procedure.input(this.input).use(({ ctx, next, input }) => {
-        return next({
-          ctx: {
-            ...(ctx as object),
-            pusher: this.pusher.setInput((input as any).prpc as any),
-          },
+  trigger<
+    $Output,
+    TParams extends ProcedureParams<
+      AnyRootConfig,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown,
+      unknown
+    > = InferTRPCProcedureParams<TProcedure>
+  >(
+    resolver: (
+      opts: Simplify<{
+        ctx: Simplify<
+          TParams["_ctx_out"] & {
+            pusher: PRPCPusher<false>;
+          }
+        >;
+        input: Simplify<
+          TParams["_input_in"] & ReturnType<typeof PRPCInput<never>>
+        >;
+      }>
+    ) => MaybePromise<$Output>
+  ): BuildProcedure<"mutation", TParams, $Output> {
+    if (this.input as any) {
+      let p = (this.procedure as any)
+        .input(this.input)
+        .use(({ ctx, next, input }: any) => {
+          return next({
+            ctx: {
+              ...(ctx as object),
+              pusher: this.pusher.setInput((input as any).prpc as any),
+            },
+          });
         });
-      });
       this.input = null;
-      if (this.middleware) {
+      if (this.middleware as any) {
         p = p.use(this.middleware);
         this.middleware = null;
       }
-      return p.mutation;
+      return p.mutation as any;
     } else {
-      let p = this.procedure.use(({ ctx, next, input }) => {
+      let p = (this.procedure as any).use(({ ctx, next, input }: any) => {
         return next({
           ctx: {
             ...(ctx as object),
@@ -92,10 +164,10 @@ export class PRPCPublicRouteTRPC<
         });
       });
       if (this.middleware) {
-        p = p.use(this.middleware);
+        p = p.use(this.middleware as any);
         this.middleware = null;
       }
-      return p.mutation;
+      return p.mutation as any;
     }
   }
 }
@@ -188,8 +260,8 @@ export class PRPCPresenceRouteTRPC<
     >,
     "_defs"
   > {
-    this.input = schema;
     // @ts-ignore
+    this.input = schema;
     return this;
   }
 
